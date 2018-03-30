@@ -147,11 +147,9 @@ def write_mdl2(filepath,
 							pack('I', 0)
 							+ pack('H', bitmap_id)
 							+ pack('B', 0)
-							+ pack('B', 0)
+							+ pack('B', 3) # 3 = tiling enabled, 0 = disabled
 						),
-						b'\xff\xff\xff\xff\xff\xff\x0f\x03',
-						b'\xff\xff\xff\xff\xff\xff\x0f\x03',
-						b'\xff\xff\xff\xff\xff\xff\x0f\x03',
+						*(b'\xff\xff\xff\xff\xff\xff\x0f\x03',)*3,
 					):
 						f.write(texblend)
 					f.write(
@@ -167,11 +165,19 @@ def write_mdl2(filepath,
 						+ pack('H', 0) #geo1_vertex_currentvertex # looks unused, appears as a partially overwritten float in the official files
 						+ b'\0'*8
 					)
+					try: uvlayer = dl_mesh.loops.layers.uv[0]
+					except IndexError: raise IndexError('Model does not have a UV map.')
 					for vert in dl_mesh.verts:
+						uv = ()
+						for face in dl_mesh.faces:
+							for loop in face.loops:
+								if loop.vert.index == vert.index:
+									uv = loop[uvlayer].uv
+						assert uv, 'Did not find UV for vertex %i.' % vert
 						f.write(
 							pack('3f', *tuple(vert.co)[::-1])
 							+ pack('3f', *tuple(vert.normal)[::-1])
-							+ pack('2f', 0, 0) # uv, currently unsupported
+							+ pack('2f', *uv) # uv, currently unsupported
 						)
 						
 					f.write(
