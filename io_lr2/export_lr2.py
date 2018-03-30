@@ -177,7 +177,7 @@ def write_mdl2(filepath,
 						f.write(
 							pack('3f', *tuple(vert.co)[::-1])
 							+ pack('3f', *tuple(vert.normal)[::-1])
-							+ pack('2f', *uv) # uv, currently unsupported
+							+ pack('2f', *uv)
 						)
 						
 					f.write(

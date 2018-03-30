@@ -1,10 +1,8 @@
-from struct import unpack
-from sys import argv
+from struct  import unpack
+from sys     import argv
 from os.path import split, splitext, join
-from io import BytesIO as bio
-
-try: import bpy, bmesh
-except ModuleNotFoundError: pass
+from io      import BytesIO as bio
+import bpy, bmesh
 
 def readnulltermstring(input,skip=False):
 	if type(input) in (str, bytes): #else it's a file object
@@ -25,8 +23,8 @@ def readnulltermstring(input,skip=False):
 # b'MDL1', # old model version, rare
 # b'MDL0', # old model version with no chunk system, rare
 # b'P2G0', # unknown
-# b'GEO1', # mesh data
-# b'COLD', # COLlision Data?
+# b'GEO1', # GEOmetry, mesh data
+# b'COLD', # COLlision Data
 # b'SHA0', # unknown
 # b'SKN0', # weights?
 
@@ -158,7 +156,7 @@ def open_mdl2(filepath, open_bitmaps = True):
 					#geo1_texblend0-3_effect          ,\
 					#geo1_texblend0-3_textureindex    ,\
 					#geo1_texblend0-3_coordinateindex ,\
-					#geo1_texblend0-3_tilinginfo      = unpack('IH2B', f.read(4+2+1*2))
+					#geo1_texblend0-3_tilinginfo      = unpack('IH2B', f.read(4+2+1*2)) # tilinginfo 0x3 = tiling enabled, 0 = disabled
 					print('  Texture blend effect mask: %i'      % geo1_texblend_effectmask)
 					print('  Texture blend render reference: %i' % geo1_texblend_renderreference)
 					print('  Texture blend effects: %i'          % geo1_texblend_effects)
@@ -191,6 +189,7 @@ def open_mdl2(filepath, open_bitmaps = True):
 					work_bmesh.verts.ensure_lookup_table()
 					
 					uvs = []
+					normals = []
 					assert geo1_vertex_flags & VERTEX_HAS_VECTOR, 'Vertex struct has no vertices.'
 					for vertex in range(geo1_vertex_vertices):
 						# this dumb code works, but there is probably a model or two it doesn't work on. wip
@@ -200,10 +199,10 @@ def open_mdl2(filepath, open_bitmaps = True):
 						elif geo1_vertex_size_vertstruct == 0x24: vertex_struct.read(4)
 						elif geo1_vertex_size_vertstruct == 0x28: vertex_struct.read(8)
 						else: raise AssertionError('Unexpected vertex struct size (%s).' % hex(geo1_vertex_size_vertstruct))
-						vertex_normal = unpack('3f', vertex_struct.read(12))
+						vertex_normal = unpack('3f', vertex_struct.read(12))[::-1]
 						vertex_uv     = unpack('2f', vertex_struct.read(8))
-						work_bmesh.verts[vertex].co     = vertex_xyz
-						#work_bmesh.verts[vertex].normal = vertex_normal # this doesn't even seem to have any effect. recalculated and rewritten when applied to an object mesh?
+						work_bmesh.verts[vertex].co = vertex_xyz
+						normals += [vertex_normal]
 						uvs += [vertex_uv]
 					
 					geo1_fill_selectableprimblocks,\
@@ -223,6 +222,12 @@ def open_mdl2(filepath, open_bitmaps = True):
 					
 					work_mesh = bpy.data.meshes.new(rendergroup_string % (rendergroup_id, geo1_texblend_blends[0][1]))
 					work_bmesh.to_mesh(work_mesh)
+					
+					#### uv test
+					work_mesh.normals_split_custom_set_from_vertices(normals)
+					work_mesh.use_auto_smooth = True
+					#### uv test
+					
 					work_obj = bpy.data.objects.new(rendergroup_string % (rendergroup_id, geo1_texblend_blends[0][1]), work_mesh)
 					work_obj.data.materials.append(materials[geo1_texblend_blends[0][1]])
 					work_obj.parent = dl_root
