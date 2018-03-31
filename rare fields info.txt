@@ -10,14 +10,13 @@ b'COLD', # COLlision Data
 b'SHA0', # unknown
 b'SKN0', # weights?
 
-# in this file i define these model groups:
+# in this file i define these groups of models:
 # old      - 18 files with old version headers
 # flow     - 17 files with more than 1 uv coordinate per vertex
 # colored  - 35 files with vertex color defined
 # effects  - 54 files that use texblends
 # distant  - 58 files that have level of detail (lod) meshes
 # double   - 26 files that have the same polygon defined more than once
-# matted   - 341 files use more than 1 material
 # rgeffect - 2 files have rendergroup effects
 # disorder - 108 files have unordered bitmap indices
 
