@@ -27,15 +27,11 @@ def write_mdl2(filepath,
 	bounding_radius = 5,
 	distance_fades = True,
 	use_bounding_box = True,
-	use_unique_materials = False,
-	use_unique_textures = False,
-	use_generic_geometry = False,
-	vertex_buffer_flags = 0x0,
-	matprops = 3,
+	matprops = 3, # crashes if 1
 ):
 	meshroots    = []
 	bitmap_paths = []
-	validroot = False
+	validroot    = False
 	for root in bpy.data.objects:
 		if root.type == 'EMPTY' and root.parent == None:
 			for detaillevel in root.children:
@@ -54,12 +50,10 @@ def write_mdl2(filepath,
 							meshroots[-1][1] += [(rendergroup, bitmap_paths.index(bitmap_path))]
 						assert validmesh, 'Detail level "%s" has no valid mesh.' % detaillevel.name
 	assert meshroots, 'Could not find any valid roots. Import an .md2 to see the required hierarchy.'
-	#print(meshroots)
-	#print(bitmap_paths)
 	
 	f = open(filepath, 'wb')
 	
-	for chunkname in (b'MDL2', b'GEO1', b'COLD'):
+	for chunkname in (b'MDL2', b'GEO1'):
 		f.write(chunkname + b'\0\0\0\0')
 		chunkstart = f.tell()
 		if chunkname == b'MDL2':
@@ -70,17 +64,14 @@ def write_mdl2(filepath,
 				+ pack('I', use_bounding_box)
 			)
 			if use_bounding_box:
-				f.write( # placeholder
+				f.write(
 					pack('3f', -2, -2, -2) #min
 					+pack('3f', 2, 2, 2) #max
 					+pack('3f', 0, 0, 0) #center
 					+pack('f', -.0) #rotation y
 				)
 			f.write(
-				pack('I', use_unique_materials)
-				+ pack('I', use_unique_textures)
-				+ pack('I', use_generic_geometry)
-				+ pack('I', vertex_buffer_flags)
+				pack('4I', 0, 0, 0, 0)
 				+ b'\0'*48
 			)
 			f.write(
@@ -107,7 +98,7 @@ def write_mdl2(filepath,
 					+pack('f', 0)
 					+pack('I', 0)
 					+pack('I', 0)
-					+pack('8s', b'RRU') # "anim name" in liblr2, but i think it's padding
+					+pack('8s', b'RRU') # "anim name" in liblr2, but i think it's unused
 				)
 		elif chunkname == b'GEO1':
 			f.write(
@@ -189,8 +180,6 @@ def write_mdl2(filepath,
 						f.write(
 							pack('3H', *(v.index for v in face.verts))
 						)
-		elif chunkname == b'COLD':
-			pass
 				
 		chunkend = f.tell()
 		f.seek(chunkstart - 4)

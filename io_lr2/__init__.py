@@ -79,11 +79,18 @@ class ExportLR2(bpy.types.Operator, ExportHelper):
 			#('MDL0', 'MDL0', ''),
 		)
 	)
+	
+	md2_distance_fades = BoolProperty(
+		name        = 'Fade',
+		description = 'Makes the model fade at a far distance.',
+		default     = False,
+	)
 
 	def execute(self, context):
 		from . import export_lr2
 		keywords = {
 			'version': self.md2_version,
+			'distance_fades': self.md2_distance_fades
 		}
 		export_lr2.write_lr2(self.filepath, **keywords)
 		return {'FINISHED'}

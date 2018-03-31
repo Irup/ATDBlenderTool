@@ -18,16 +18,6 @@ def readnulltermstring(input,skip=False):
 		if not c or c == b'\0': return buildstring
 		buildstring += c
 
-# .md2 chunks:
-# b'MDL2', # header, texture info
-# b'MDL1', # old model version, rare
-# b'MDL0', # old model version with no chunk system, rare
-# b'P2G0', # unknown
-# b'GEO1', # GEOmetry, mesh data
-# b'COLD', # COLlision Data
-# b'SHA0', # unknown
-# b'SKN0', # weights?
-
 def open_lr2(filepath, **kwargs):
 	first4 = open(filepath,'rb').read(4)
 	if   first4 == b'MDL2': return open_mdl2(filepath, **kwargs)
@@ -35,18 +25,17 @@ def open_lr2(filepath, **kwargs):
 	#elif first4 == b'MDL0': return import_mdl0(filepath)
 	else: raise AssertionError('Input file is not a MODEL2 file.')
 
-VERTEX_HAS_VECTOR = 0b0001
-VERTEX_HAS_NORMAL = 0b0010
-VERTEX_HAS_COLOR  = 0b0100
-VERTEX_HAS_UV     = 0b1000
+VERTEX_HAS_VECTOR = 0b0001 # invariable
+VERTEX_HAS_NORMAL = 0b0010 # invariable
+VERTEX_HAS_COLOR  = 0b0100 # only set in a few models
+VERTEX_HAS_UV     = 0b1000 # invariable
 def open_mdl2(filepath, open_bitmaps = True):
 	f = open(filepath,'rb')
 	
-	open_bitmaps_successful = True
 	if open_bitmaps:
 		try: rootpath = filepath[:filepath.lower().index('game data')]
 		except ValueError:
-			open_bitmaps_successful = False
+			open_bitmaps = False
 			print('Could not trace back to root directory "GAME DATA".')
 		
 	bpy.ops.object.empty_add()
@@ -66,21 +55,32 @@ def open_mdl2(filepath, open_bitmaps = True):
 		print('%s: %s' % (chunk_name.decode('ascii'), hex(chunk_size)))
 		
 		if   chunk_name == b'MDL2':
+			# variable
+			# variable
+			# variable, 0 for map landmarks, 1 for small objects
+			# always 1
 			mdl2_inertiamulti   = unpack('3f', f.read(12))
-			mdl2_boundingradius = unpack('f', f.read(4))
-			mdl2_distancefades  = unpack('I', f.read(4))
-			mdl2_hasboundingbox = unpack('I', f.read(4))
+			mdl2_boundingradius,\
+			mdl2_distancefades ,\
+			mdl2_hasboundingbox = unpack('f2I', f.read(12))
+			
 			if mdl2_hasboundingbox:
 				mdl2_boundingboxmin    = unpack('3f', f.read(12))
 				mdl2_boundingboxmax    = unpack('3f', f.read(12))
 				mdl2_boundingboxcenter = unpack('3f', f.read(12))
 				mdl2_boundingboxroty   = unpack('f', f.read(4))
-			mdl2_useuniquematerials = unpack('I', f.read(4))
-			mdl2_useuniquetextures  = unpack('I', f.read(4))
-			mdl2_usegenericgeometry = unpack('I', f.read(4))
-			mdl2_vertexbufferflags  = unpack('I', f.read(4))
-			f.seek(f.tell() + 48) # padding
+				
+			# always 0
+			# always 0
+			# always 0
+			# always 0
+			mdl2_useuniquematerials,\
+			mdl2_useuniquetextures ,\
+			mdl2_usegenericgeometry,\
+			mdl2_vertexbufferflags  = unpack('4I', f.read(16))
+			f.seek(f.tell() + 48)
 			
+			# variable
 			mdl2_bitmap_count = unpack('I', f.read(4))[0]
 			print('	Textures:', mdl2_bitmap_count)
 			for bitmap_id in range(mdl2_bitmap_count):
@@ -91,6 +91,7 @@ def open_mdl2(filepath, open_bitmaps = True):
 				bitmaps += [(bitmap_path, bitmap_type, bitmap_index)]
 			materials = [bpy.data.materials.new(x[0]) for x in bitmaps]
 			
+			# variable
 			mdl2_matprop_count = unpack('I', f.read(4))[0]
 			for matprop_id in range(mdl2_matprop_count):
 				mdl2_matprop_ambient   = unpack('4f', f.read(16))
@@ -113,56 +114,67 @@ def open_mdl2(filepath, open_bitmaps = True):
 					mdl2_matprop_bitfield ,
 					mdl2_matprop_animname ,
 				)]
-			print('End of MDL2:', hex(f.tell()))
 			
 		elif chunk_name == b'GEO1':
+			#variable
 			geo1_detaillevels = unpack('I', f.read(4))[0]
-			detaillevel_string = 'Detail level %%0%ii' % len(str(geo1_detaillevels))
-			print('Detail levels: %i' % geo1_detaillevels)
 			
+			detaillevel_string = 'Detail level %%0%ii' % len(str(geo1_detaillevels))
 			for detaillevel_id in range(geo1_detaillevels):
-				print('Detail level %i:' % detaillevel_id)
 				bpy.ops.object.empty_add()
 				dl_root = bpy.context.scene.objects[0]
 				dl_root.name = detaillevel_string % detaillevel_id
 				dl_root.parent = obj_root
 				
+				# variable; 0 for base mesh, 1 for distant mesh (model type distant)
+				# variable, unknown purpose, is the distance between the two most distant connected vertices
+				# variable, detail level is split into submeshes as textures are applied per submesh
 				geo1_detaillevel_type         ,\
 				geo1_detaillevel_maxedgelength,\
 				geo1_rendergroups       = unpack('IfI', f.read(12))
-				f.seek(f.tell() + 8) # padding
-				print(' Detail level type: %i'            % geo1_detaillevel_type)
-				print(' Detail level max edge length: %f' % geo1_detaillevel_maxedgelength)
-				print(' Render groups: %i'                % geo1_rendergroups)
+				f.seek(f.tell() + 8)
+				
+				print(geo1_detaillevel_maxedgelength)
 				
 				rendergroup_string = 'Rendergroup %%0%ii (Material %%0%ii)' % (len(str(geo1_rendergroups)), len(str(len(bitmaps))))
 				for rendergroup_id in range(geo1_rendergroups):
+					# variable
+					# variable
+					# variable
+					# 512 in rgeffects models, else 0
 					work_bmesh = bmesh.new()
 					geo1_rendergroup_polygons,\
 					geo1_rendergroup_vertices,\
 					geo1_rendergroup_material,\
 					geo1_rendergroup_effects  = unpack('4H', f.read(8))
-					f.seek(f.tell() + 12) # padding
-					print('  Render group polygons: %i' % geo1_rendergroup_polygons)
-					print('  Render group vertices: %i' % geo1_rendergroup_vertices)
-					print('  Render group material: %i' % geo1_rendergroup_material)
-					print('  Render group effects: %i'  % geo1_rendergroup_effects)
+					f.seek(f.tell() + 12)
+					
+					# variable as 3, 9, 17, or 513 in effects models, else 0
+					# always 0
+					# 2 in effects models, else always 1
+					# always 0
+					# 2 in flow models, else always 1
 					geo1_texblend_effectmask     ,\
 					geo1_texblend_renderreference,\
 					geo1_texblend_effects        ,\
 					geo1_texblend_custom         ,\
 					geo1_texblend_coordinates     = unpack('3H2B', f.read(8))
 					geo1_texblend_blends          = tuple(unpack('IH2B', f.read(8)) for x in range(4))
-					#geo1_texblend0-3_effect          ,\
-					#geo1_texblend0-3_textureindex    ,\
-					#geo1_texblend0-3_coordinateindex ,\
-					#geo1_texblend0-3_tilinginfo      = unpack('IH2B', f.read(4+2+1*2)) # tilinginfo 0x3 = tiling enabled, 0 = disabled
-					print('  Texture blend effect mask: %i'      % geo1_texblend_effectmask)
-					print('  Texture blend render reference: %i' % geo1_texblend_renderreference)
-					print('  Texture blend effects: %i'          % geo1_texblend_effects)
-					print('  Texture blend custom: %i'           % geo1_texblend_custom)
-					print('  Texture blend coordinates: %i'      % geo1_texblend_coordinates)
-					print('  Texture blend blends: %i'           % len(geo1_texblend_blends))
+					# I effect         
+					# H textureindex    # the bitmap used on the rendergroup
+					# B coordinateindex
+					# B tilinginfo      # 0x3 = tiling enabled, 0 = disabled
+					
+					# always 0
+					# always 12
+					# variable (trash memory if not geo1_vertex_flags & VERTEX_HAS_COLOR)
+					# variable on account of previous int
+                    # variable on account of previous ints
+					# either 1, or 2 (rare)
+					# see VERTEX_HAS_VECTOR and related
+					# identical to geo1_rendergroup_vertices
+					# always 1
+					# either 15998, 16256, or 0
 					geo1_vertex_offset_vector  ,\
 					geo1_vertex_offset_normal  ,\
 					geo1_vertex_offset_colour  ,\
@@ -173,44 +185,37 @@ def open_mdl2(filepath, open_bitmaps = True):
 					geo1_vertex_vertices       ,\
 					geo1_vertex_managedbuffer  ,\
 					geo1_vertex_currentvertex   = unpack('4i2I4H', f.read(32))
-					f.seek(f.tell() + 8) # padding
-					print('  Vertex vector offset: %i'       % geo1_vertex_offset_vector)
-					print('  Vertex normal offset: %i'       % geo1_vertex_offset_normal)
-					print('  Vertex colour offset: %i'       % geo1_vertex_offset_colour)
-					print('  Vertex uv offset: %i'           % geo1_vertex_offset_texcoord)
-					print('  Vertex struct size: %i'         % geo1_vertex_size_vertstruct)
-					print('  Vertex texture coordinates: %i' % geo1_vertex_num_texcoords)
-					print('  Vertex flags: %s'               % format(geo1_vertex_flags, '08b'))
-					print('  Vertex vertices: %i'            % geo1_vertex_vertices)
-					print('  Vertex managed buffer: %i'      % geo1_vertex_managedbuffer)
-					print('  Vertex current: %i'             % geo1_vertex_currentvertex)
+					f.seek(f.tell() + 8)
 					
 					for vertex in range(geo1_vertex_vertices): work_bmesh.verts.new()
 					work_bmesh.verts.ensure_lookup_table()
 					
 					uvs = []
 					normals = []
-					assert geo1_vertex_flags & VERTEX_HAS_VECTOR, 'Vertex struct has no vertices.'
 					for vertex in range(geo1_vertex_vertices):
-						# this dumb code works, but there is probably a model or two it doesn't work on. wip
-						vertex_struct = bio(f.read(geo1_vertex_size_vertstruct))
-						vertex_xyz    = unpack('3f', vertex_struct.read(12))[::-1]
-						if geo1_vertex_size_vertstruct == 0x20: pass
-						elif geo1_vertex_size_vertstruct == 0x24: vertex_struct.read(4)
-						elif geo1_vertex_size_vertstruct == 0x28: vertex_struct.read(8)
-						else: raise AssertionError('Unexpected vertex struct size (%s).' % hex(geo1_vertex_size_vertstruct))
-						vertex_normal = unpack('3f', vertex_struct.read(12))[::-1]
-						vertex_uv     = unpack('2f', vertex_struct.read(8))
+						vstruct = bio(f.read(geo1_vertex_size_vertstruct))
+						vertex_xyz    = unpack('3f', vstruct.read(12))[::-1]
+						vertex_normal = unpack('3f', vstruct.read(12))[::-1]
+						if geo1_vertex_flags & VERTEX_HAS_COLOR:
+							vertex_color = unpack('4f', vstruct.read(16))
+						for texcoord_id in range(geo1_vertex_num_texcoords):
+							vertex_uv     = unpack('2f', vstruct.read(8))
 						work_bmesh.verts[vertex].co = vertex_xyz
 						normals += [vertex_normal]
 						uvs += [vertex_uv]
 					
+					# always 1
+					# always 0
+					# always equal to (geo1_rendergroup_polygons*3)
 					geo1_fill_selectableprimblocks,\
 					geo1_fill_type                ,\
 					geo1_fill_indices              = unpack('3I', f.read(12))
 					
-					for polygon in range(geo1_fill_indices // 3):
-						work_bmesh.faces.new((work_bmesh.verts[x] for x in unpack('3H', f.read(6))))#.material_index = geo1_texblend_blends[0][1]
+					for polygon in range(geo1_rendergroup_polygons):
+						try:
+							work_bmesh.faces.new((work_bmesh.verts[x] for x in unpack('3H', f.read(6))))
+						except ValueError: # accounts for models of type double, but does not fix the problem
+							print('Polygon %i in rendergroup %i is a two-sided face, and this is unsupported.' % (polygon, rendergroup_id))
 					
 					### uv
 					work_bmesh.faces.ensure_lookup_table()
@@ -239,6 +244,6 @@ def open_mdl2(filepath, open_bitmaps = True):
 	
 	obj_root.rotation_euler = (__import__('math').pi / 2, 0, 0)
 	
-	if open_bitmaps and open_bitmaps_successful:
+	if open_bitmaps:
 		for bitmap in bitmaps:
 			bpy.ops.image.open(filepath = join(rootpath, splitext(bitmap[0])[0] + '.mip'))
