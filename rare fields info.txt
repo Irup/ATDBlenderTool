@@ -1,0 +1,356 @@
+# There are 1022 md2 files in the game data directory.
+
+# .md2 chunks:
+b'MDL2', # header, texture info
+b'MDL1', # old model version
+b'MDL0', # old model version with no chunk system
+b'P2G0', # unknown
+b'GEO1', # GEOmetry, mesh data
+b'COLD', # COLlision Data
+b'SHA0', # unknown
+b'SKN0', # weights?
+
+# in this file i define these model groups:
+# old      - 18 files with old version headers
+# flow     - 17 files with more than 1 uv coordinate per vertex
+# colored  - 35 models with vertex color defined
+# effects  - 54 models that use texblends
+# distant  - 58 models that have level of detail (lod) meshes
+# double   - 26 models that have the same polygon defined more than once
+# matted   - 341 models use more than 1 material
+# rgeffect - 2 models have rendergroup effects
+# disorder - 108 models have unordered bitmap indices
+
+# old - 18 files with old version headers
+MDL1 car craze\buildings\models\cc_stadia_pillar.md2
+MDL1 car craze\buildings\models\cc_stadia_pillar02.md2
+MDL1 car craze\objects\models\cc_floatylight.md2
+MDL1 common\models\checkpoints\cppost.md2
+MDL0 editor gen\patches\models\arctic_neil-wigfield_2003_23407.md2
+MDL0 editor gen\patches\models\arctic_neil-wigfield_2003_5475.md2
+MDL0 editor gen\patches\models\arctic_neil-wigfield_2702_32764.md2
+MDL0 editor gen\patches\models\arctic_neilw_0711_2788.md2
+MDL0 editor gen\patches\models\arctic_neilw_0711_8388.md2
+MDL0 editor gen\patches\models\arctic_neilw_2610_25572.md2
+MDL0 editor gen\patches\models\arctic_neilw_3010_4709.md2
+MDL0 editor gen\patches\models\bonus_build 1 area 1_2711_24819.md2
+MDL0 editor gen\patches\models\default world_build 1 area 1_2711_24819.md2
+MDL0 editor gen\patches\models\lightingtest_build 1 area 1_2711_24819.md2
+MDL0 editor gen\patches\models\mikesand_mikem_3010_15865.md2
+MDL0 editor gen\patches\models\reverbworld_build 1 area 1_2711_24819.md2
+MDL0 editor gen\patches\models\sandy_mikem_3010_15865.md2
+MDL0 editor gen\patches\models\whatever_mikem_3010_15865.md2
+
+# flow - 17 files that have geo1_texblend_coordinates and their amount of uv vectors per vertex as 2 instead of 1
+adventurers\objects\models\foyer_waterfall_01.md2
+adventurers\objects\models\foyer_waterfall_02.md2
+adventurers\objects\models\lava_fall_01.md2
+adventurers\objects\models\lava_fall_02.md2
+adventurers\objects\models\lava_fall_03.md2
+adventurers\objects\models\waterfall_01.md2
+adventurers\objects\models\waterfall_02.md2
+lom\objects\models\waterfall1.md2
+lom\objects\models\waterfall2.md2
+lom\objects\models\waterfall3.md2
+lom\objects\models\waterfall4.md2
+sandy island\objects\models\big_rockfall1.md2
+sandy island\objects\models\big_rockfall2.md2
+sandy island\objects\models\s_waterfall1.md2
+sandy island\objects\models\s_waterfall2.md2
+sandy island\objects\models\water_pipe_flow.md2
+sandy island\objects\models\water_pipe_flow2.md2
+
+# colored - 35 files with vertex color
+adventurers\objects\models\forest_clump_01.md2
+adventurers\objects\models\forest_clump_02.md2
+adventurers\objects\models\forest_clump_03.md2
+adventurers\objects\models\forest_clump_06.md2
+adventurers\objects\models\forest_clump_07.md2
+adventurers\objects\models\forest_clump_08.md2
+adventurers\objects\models\forest_clump_09.md2
+adventurers\objects\models\forest_clump_10.md2
+adventurers\objects\models\forest_clump_11.md2
+adventurers\objects\models\forest_clump_14.md2
+adventurers\objects\models\forest_clump_15.md2
+adventurers\objects\models\forest_clump_16.md2
+adventurers\objects\models\volc_route.md2
+adventurers\objects\models\ps2_forest\forest_clump_01.md2
+adventurers\objects\models\ps2_forest\forest_clump_02.md2
+adventurers\objects\models\ps2_forest\forest_clump_03.md2
+adventurers\objects\models\ps2_forest\forest_clump_06.md2
+adventurers\objects\models\ps2_forest\forest_clump_07.md2
+adventurers\objects\models\ps2_forest\forest_clump_08.md2
+adventurers\objects\models\ps2_forest\forest_clump_09.md2
+adventurers\objects\models\ps2_forest\forest_clump_14.md2
+adventurers\objects\models\ps2_forest\forest_clump_15.md2
+adventurers\objects\models\ps2_forest\forest_clump_16.md2
+arctic\foyer\arc_foyer2.md2
+arctic\foyer\foyer_grass.md2
+arctic\objects\models\mount_inside.md2
+arctic\objects\models\tunnel.md2
+lom\foyer\lom_foyer.md2
+lom\objects\models\cave.md2
+lom\objects\models\power_store.md2
+lom\objects\models\rejoove-ent.md2
+lom\objects\models\rejoov_arch.md2
+lom\objects\models\rejoov_invis.md2
+lom\objects\models\rejoov_workgodamnyou.md2
+sandy island\objects\models\tunnel1.md2
+
+# effects - 54 files have non-zero bitmap_type (first number), geo1_texblend_effectmask not as 1 (second number), don't have geo1_texblend_effects as 1 but as 2 instead, and has more than 1 texblend defined in at least one rendergroup
+4 17  adventurers\objects\models\foyer_waterfall_01.md2
+4 17  adventurers\objects\models\foyer_waterfall_02.md2
+4 17  adventurers\objects\models\lava_fall_01.md2
+4 17  adventurers\objects\models\lava_fall_02.md2
+4 17  adventurers\objects\models\lava_fall_03.md2
+4 17  adventurers\objects\models\waterfall_01.md2
+4 17  adventurers\objects\models\waterfall_02.md2
+9 513 animation\beige_beast\beige.md2
+9 513 animation\bluemech\bluemech.md2
+9 513 animation\red_mech\redmech.md2
+1 3   animation\theberg\theberg.md2
+9 513 animation\theberg\anm\theberg.md2
+9 513 animation\trophy\trophy.md2
+1 3   animation\tyreman\tyreman.md2
+9 513 arctic\foyer\ice_statue.md2
+9 513 arctic\objects\models\bergs_icicle.md2
+1 3   arctic\objects\models\big_crystal.md2
+3 9   arctic\objects\models\igloo_small.md2
+1 3   arctic\objects\models\med_crystal.md2
+9 513 arctic\objects\models\mount_inside.md2
+1 3   arctic\objects\models\sml_crystal.md2
+9 513 car craze\objects\models\cc_trophy.md2
+9 513 characters\heads\models\bb.md2
+9 513 characters\heads\models\doc.md2
+9 513 characters\heads\models\mac.md2
+9 513 characters\heads\models\officer.md2
+9 513 characters\heads\models\player2.md2
+9 513 characters\heads\models\player5.md2
+9 513 characters\heads\models\rocket racer.md2
+9 513 common\models\pickups\gbshard_01.md2
+9 513 common\models\pickups\gbshard_02.md2
+9 513 common\models\pickups\golden_brick.md2
+9 513 common\models\trophy\trophy.md2
+9 513 common\weapons\corkscrew\models\corkscrew_drill.md2
+9 513 lom\cars\models\3wheeler.md2
+9 513 lom\cars\models\beige_hover.md2
+9 513 lom\cars\models\blue_hover.md2
+9 513 lom\cars\models\purp_hover.md2
+9 513 lom\cars\models\red_hoverer.md2
+9 513 lom\objects\models\shuttle.md2
+4 17  lom\objects\models\waterfall1.md2
+4 17  lom\objects\models\waterfall2.md2
+4 17  lom\objects\models\waterfall3.md2
+4 17  lom\objects\models\waterfall4.md2
+9 513 objects\bricks\lifeonmars\trim\reflector.md2
+9 513 objects\bricks\lifeonmars\window\lom windscreen grey.md2
+1 3   sandy island\buildings\models\cc_jumpgate_warp.md2
+4 17  sandy island\objects\models\big_rockfall1.md2
+4 17  sandy island\objects\models\big_rockfall2.md2
+9 513 sandy island\objects\models\shuttle.md2
+4 17  sandy island\objects\models\s_waterfall1.md2
+4 17  sandy island\objects\models\s_waterfall2.md2
+4 17  sandy island\objects\models\water_pipe_flow.md2
+4 17  sandy island\objects\models\water_pipe_flow2.md2
+
+# distant - 58 files with geo1_detaillevel_type not as 1, but as 2 (lod type)
+adventurers\buildings\models\hut_2.md2
+adventurers\buildings\models\hut_3.md2
+adventurers\buildings\models\res_compound.md2
+adventurers\buildings\models\res_footbridge.md2
+adventurers\buildings\models\temple_01.md2
+adventurers\buildings\models\temple_02.md2
+adventurers\objects\models\barrier_left.md2
+adventurers\objects\models\barrier_right.md2
+adventurers\objects\models\rope_bridge.md2
+adventurers\objects\models\rope_bridge_support_01.md2
+adventurers\objects\models\rope_bridge_support_02.md2
+adventurers\objects\models\transporter_truck.md2
+adventurers\objects\models\waterfall_02.md2
+arctic\buildings\models\med_centre.md2
+arctic\buildings\models\mobile_outpost.md2
+arctic\buildings\models\mobile_outpost2.md2
+arctic\buildings\models\mobile_outpost_radar.md2
+arctic\buildings\models\research2.md2
+arctic\buildings\models\scorp_jail.md2
+arctic\buildings\models\storage_depot.md2
+arctic\cars\models\buggy_wheel.md2
+arctic\objects\models\artplane.md2
+arctic\objects\models\artplaneprop.md2
+arctic\objects\models\fence_left.md2
+arctic\objects\models\fence_right.md2
+arctic\objects\models\mount_inside.md2
+arctic\objects\models\shipopt.md2
+arctic\objects\models\tunnel.md2
+lom\buildings\models\alien_base.md2
+lom\buildings\models\docking_bay.md2
+lom\buildings\models\outpost.md2
+lom\buildings\models\pipe_joiner.md2
+lom\buildings\models\pod_bay1.md2
+lom\buildings\models\pod_bay2.md2
+lom\buildings\models\old_base\mainpart.md2
+lom\cars\models\blue_hover.md2
+lom\objects\models\bigbridge.md2
+lom\objects\models\fence_left.md2
+lom\objects\models\fence_right.md2
+lom\objects\models\shuttle.md2
+sandy island\buildings\models\arcitc_pier.md2
+sandy island\buildings\models\garage1.md2
+sandy island\buildings\models\garage2.md2
+sandy island\buildings\models\garage3.md2
+sandy island\buildings\models\police_build1.md2
+sandy island\buildings\models\police_build2.md2
+sandy island\buildings\models\police_build3.md2
+sandy island\buildings\models\sci_lab_main.md2
+sandy island\buildings\models\town_house01.md2
+sandy island\buildings\models\town_house02a.md2
+sandy island\buildings\models\town_house02b.md2
+sandy island\buildings\models\town_house03.md2
+sandy island\objects\models\breakdown_truck.md2
+sandy island\objects\models\dumper.md2
+sandy island\objects\models\police_car.md2
+sandy island\objects\models\police_chopper.md2
+sandy island\objects\models\sign_chev.md2
+sandy island\objects\models\sign_chev2.md2
+
+# double - 26 files have the same polygon defined more than once
+arctic\buildings\models\med_centre.md2
+arctic\buildings\models\storage_depot.md2
+arctic\objects\models\artplaneprop.md2
+arctic\objects\models\lego_bridge.md2
+arctic\objects\models\meteor1.md2
+arctic\objects\models\plant1.md2
+arctic\objects\models\shipopt.md2
+arctic\objects\models\submarine_small.md2
+common\models\the pits\laser_fence.md2
+lom\buildings\models\alien_base.md2
+lom\buildings\models\docking_bay.md2
+lom\buildings\models\pod_bay1.md2
+lom\buildings\models\pod_bay2.md2
+lom\buildings\models\old_base\mainpart.md2
+lom\cars\models\blue_hover.md2
+lom\foyer\bridge.md2
+lom\objects\models\bigbridge.md2
+sandy island\buildings\models\adventures_pier.md2
+sandy island\buildings\models\garage1.md2
+sandy island\objects\models\breakdown_truck.md2
+sandy island\objects\models\palmtree1.md2
+sandy island\objects\models\palmtree2.md2
+sandy island\objects\models\palmtree3.md2
+sandy island\objects\models\police_car.md2
+sandy island\objects\models\sound_dummy.md2
+sandy island\objects\models\water_pipe_flow.md2
+
+# rgeffect - 2 models have rendergroup effects that are not 0, but 512 instead
+arctic\objects\models\mount_inside.md2
+arctic\objects\models\tunnel.md2
+
+# disorder - 108 models have bitmap indices out of order in their definitions
+adventurers\buildings\models\hut_2.md2
+adventurers\buildings\models\hut_3.md2
+adventurers\buildings\models\res_compound.md2
+adventurers\buildings\models\res_footbridge.md2
+adventurers\buildings\models\temple_01.md2
+adventurers\buildings\models\temple_02.md2
+adventurers\objects\models\barrier_left.md2
+adventurers\objects\models\barrier_right.md2
+adventurers\objects\models\foyer_waterfall_01.md2
+adventurers\objects\models\foyer_waterfall_02.md2
+adventurers\objects\models\lava_fall_01.md2
+adventurers\objects\models\lava_fall_02.md2
+adventurers\objects\models\lava_fall_03.md2
+adventurers\objects\models\rope_bridge.md2
+adventurers\objects\models\rope_bridge_support_01.md2
+adventurers\objects\models\rope_bridge_support_02.md2
+adventurers\objects\models\transporter_truck.md2
+adventurers\objects\models\waterfall_01.md2
+adventurers\objects\models\waterfall_02.md2
+animation\beige_beast\beige.md2
+animation\bluemech\bluemech.md2
+animation\red_mech\redmech.md2
+animation\theberg\theberg.md2
+animation\theberg\anm\theberg.md2
+animation\trophy\trophy.md2
+animation\tyreman\tyreman.md2
+arctic\buildings\models\med_centre.md2
+arctic\buildings\models\mobile_outpost.md2
+arctic\buildings\models\mobile_outpost2.md2
+arctic\buildings\models\mobile_outpost_radar.md2
+arctic\buildings\models\research2.md2
+arctic\buildings\models\scorp_jail.md2
+arctic\buildings\models\storage_depot.md2
+arctic\cars\models\buggy_wheel.md2
+arctic\foyer\ice_statue.md2
+arctic\objects\models\artplane.md2
+arctic\objects\models\artplaneprop.md2
+arctic\objects\models\bergs_icicle.md2
+arctic\objects\models\big_crystal.md2
+arctic\objects\models\fence_left.md2
+arctic\objects\models\fence_right.md2
+arctic\objects\models\igloo_small.md2
+arctic\objects\models\med_crystal.md2
+arctic\objects\models\mount_inside.md2
+arctic\objects\models\shipopt.md2
+arctic\objects\models\sml_crystal.md2
+arctic\objects\models\tunnel.md2
+car craze\objects\models\cc_trophy.md2
+characters\heads\models\bb.md2
+characters\heads\models\doc.md2
+characters\heads\models\mac.md2
+characters\heads\models\officer.md2
+characters\heads\models\player2.md2
+characters\heads\models\player5.md2
+characters\heads\models\rocket racer.md2
+common\models\pickups\gbshard_01.md2
+common\models\pickups\gbshard_02.md2
+common\models\pickups\golden_brick.md2
+common\models\trophy\trophy.md2
+common\weapons\corkscrew\models\corkscrew_drill.md2
+lom\buildings\models\alien_base.md2
+lom\buildings\models\docking_bay.md2
+lom\buildings\models\outpost.md2
+lom\buildings\models\pipe_joiner.md2
+lom\buildings\models\pod_bay1.md2
+lom\buildings\models\pod_bay2.md2
+lom\buildings\models\old_base\mainpart.md2
+lom\cars\models\3wheeler.md2
+lom\cars\models\beige_hover.md2
+lom\cars\models\blue_hover.md2
+lom\cars\models\purp_hover.md2
+lom\cars\models\red_hoverer.md2
+lom\objects\models\bigbridge.md2
+lom\objects\models\fence_left.md2
+lom\objects\models\fence_right.md2
+lom\objects\models\shuttle.md2
+lom\objects\models\waterfall1.md2
+lom\objects\models\waterfall2.md2
+lom\objects\models\waterfall3.md2
+lom\objects\models\waterfall4.md2
+objects\bricks\lifeonmars\trim\reflector.md2
+objects\bricks\lifeonmars\window\lom windscreen grey.md2
+sandy island\buildings\models\arcitc_pier.md2
+sandy island\buildings\models\cc_jumpgate_warp.md2
+sandy island\buildings\models\garage1.md2
+sandy island\buildings\models\garage2.md2
+sandy island\buildings\models\garage3.md2
+sandy island\buildings\models\police_build1.md2
+sandy island\buildings\models\police_build2.md2
+sandy island\buildings\models\police_build3.md2
+sandy island\buildings\models\sci_lab_main.md2
+sandy island\buildings\models\town_house01.md2
+sandy island\buildings\models\town_house02a.md2
+sandy island\buildings\models\town_house02b.md2
+sandy island\buildings\models\town_house03.md2
+sandy island\objects\models\big_rockfall1.md2
+sandy island\objects\models\big_rockfall2.md2
+sandy island\objects\models\breakdown_truck.md2
+sandy island\objects\models\dumper.md2
+sandy island\objects\models\police_car.md2
+sandy island\objects\models\police_chopper.md2
+sandy island\objects\models\shuttle.md2
+sandy island\objects\models\sign_chev.md2
+sandy island\objects\models\sign_chev2.md2
+sandy island\objects\models\s_waterfall1.md2
+sandy island\objects\models\s_waterfall2.md2
+sandy island\objects\models\water_pipe_flow.md2
+sandy island\objects\models\water_pipe_flow2.md2
