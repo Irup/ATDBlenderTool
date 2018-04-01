@@ -152,7 +152,7 @@ sandy island\objects\models\tunnel1.md2
 4 17  sandy island\objects\models\water_pipe_flow.md2
 4 17  sandy island\objects\models\water_pipe_flow2.md2
 
-# distant - 58 files with geo1_detaillevel_type not as 1, but as 2 (lod type)
+# distant - 58 files with more than 1 detail level, and they all have 2, and this extra detail level always has geo1_detaillevel_type not as 1, but as 2 (lod type)
 adventurers\buildings\models\hut_2.md2
 adventurers\buildings\models\hut_3.md2
 adventurers\buildings\models\res_compound.md2
