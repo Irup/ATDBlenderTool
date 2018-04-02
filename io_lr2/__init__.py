@@ -96,9 +96,9 @@ class ExportLR2(bpy.types.Operator, ExportHelper):
 		return {'FINISHED'}
 		
 def menu_func_import(self, context):
-	self.layout.operator(ImportLR2.bl_idname, text="Lego Racers 2 (.mdl2)")
+	self.layout.operator(ImportLR2.bl_idname, text="Lego Racers 2 (.md2)")
 def menu_func_export(self, context):
-	self.layout.operator(ExportLR2.bl_idname, text="Lego Racers 2 (.mdl2)")
+	self.layout.operator(ExportLR2.bl_idname, text="Lego Racers 2 (.md2)")
 def register():
 	bpy.utils.register_class(ImportLR2)
 	bpy.utils.register_class(ExportLR2)
