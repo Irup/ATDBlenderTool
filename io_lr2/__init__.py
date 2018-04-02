@@ -90,7 +90,7 @@ class ExportLR2(bpy.types.Operator, ExportHelper):
 		from . import export_lr2
 		keywords = {
 			'version': self.md2_version,
-			'distance_fades': self.md2_distance_fades
+			'distance_fades': self.md2_distance_fades,
 		}
 		export_lr2.write_lr2(self.filepath, **keywords)
 		return {'FINISHED'}

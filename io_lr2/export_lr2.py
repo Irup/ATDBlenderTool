@@ -104,10 +104,11 @@ def write_mdl2(filepath,
 			f.write(
 				pack('I', len(meshroots))
 			)
+			detaillevel_id = 0
 			for detaillevel, rendergroups in meshroots:
 				f.write(
-					pack('I', 1) #type
-					+ pack('f', 360) #max edge length (???)
+					pack('I', 1) # set in official models, but unused by the game; 1 for normal mesh, 2 for lod, but it determines lod from the detail level definition being first or second
+					+ pack('f', 5) # max edge length, unknown purpose
 					+ pack('I', len(rendergroups))
 					+ b'\0'*8
 				)
@@ -180,7 +181,7 @@ def write_mdl2(filepath,
 						f.write(
 							pack('3H', *(v.index for v in face.verts))
 						)
-				
+				detaillevel_id += 1
 		chunkend = f.tell()
 		f.seek(chunkstart - 4)
 		f.write(pack('I', chunkend - chunkstart))
