@@ -21,10 +21,30 @@ def readnulltermstring(input,skip=False):
 def open_lr2(filepath, **kwargs):
 	first4 = open(filepath,'rb').read(4)
 	if   first4 == b'MDL2': return open_mdl2(filepath, **kwargs)
-	elif first4 == b'MDL1': return open_mdl2(filepath)
+	elif first4 == b'MDL1': return open_mdl2(filepath, **kwargs)
 	elif first4 == b'MDL0': return open_mdl0(filepath, **kwargs)
 	else: raise AssertionError('Input file is not a supported type; expected signature to be MDL2, MDL1, or MDL0, recieved %s.' % str(first4)[2:-1])
 
+def buildfaces(work_bmesh, mdl0_fill_type, mdl0_polygons, f):
+	if mdl0_fill_type == 0:
+		for face in range(mdl0_polygons):
+			try:
+				work_bmesh.faces.new((work_bmesh.verts[x] for x in unpack('3H', f.read(6))))
+			except ValueError: # accounts for models of type double, but does not fix the problem
+				print('Face %i is two-sided, and this is unsupported.' % face)
+	elif mdl0_fill_type == 1:
+		vertexbuffer = [*unpack('2H', f.read(4))]
+		for face in range(mdl0_polygons):
+			print(hex(f.tell()))
+			vertexbuffer += [*unpack('H', f.read(2))]
+			try:
+				work_bmesh.faces.new(work_bmesh.verts[v] for v in vertexbuffer)
+			except ValueError:
+				print('Face %i is two-sided, and this is unsupported.' % face)
+			del vertexbuffer[0]
+	else:
+		raise AssertionError('Unsupported primitive fill type. (%i)' % mdl0_fill_type)
+	
 VERTEX_HAS_VECTOR = 0b0001 # invariable
 VERTEX_HAS_NORMAL = 0b0010 # invariable
 VERTEX_HAS_COLOR  = 0b0100 # only set in a few models
@@ -269,11 +289,7 @@ def open_mdl2(filepath, open_bitmaps = True):
 					geo1_fill_type                ,\
 					geo1_fill_indices              = unpack('3I', f.read(12))
 					
-					for polygon in range(geo1_rendergroup_polygons):
-						try:
-							work_bmesh.faces.new((work_bmesh.verts[x] for x in unpack('3H', f.read(6))))
-						except ValueError: # accounts for models of type double, but does not fix the problem
-							print('Polygon %i in rendergroup %i is a two-sided face, and this is unsupported.' % (polygon, rendergroup_id))
+					buildfaces(work_bmesh, mdl0_fill_type, mdl0_polygons, f)
 					
 					### uv
 					work_bmesh.faces.ensure_lookup_table()
@@ -388,9 +404,6 @@ def open_mdl0(filepath, open_bitmaps = True):
 	mdl0_vertex_currentvertex   = unpack('4I2I4H', f.read(32))
 	f.seek(f.tell() + 8)
 	
-	for vertex in range(mdl0_vertices): work_bmesh.verts.new()
-	work_bmesh.verts.ensure_lookup_table()
-	
 	uvs = []
 	normals = []
 	for vertex in range(mdl0_vertices):
@@ -401,21 +414,18 @@ def open_mdl0(filepath, open_bitmaps = True):
 			vertex_color = unpack('4f', vstruct.read(16))
 		for texcoord_id in range(mdl0_vertex_num_texcoords):
 			vertex_uv     = unpack('2f', vstruct.read(8))
-		work_bmesh.verts[vertex].co = vertex_xyz
+		work_bmesh.verts.new(vertex_xyz)
 		normals += [vertex_normal]
 		uvs += [vertex_uv]
+	work_bmesh.verts.ensure_lookup_table()
+	work_bmesh.verts.index_update()
 	
 	mdl0_fill_type = unpack('I', f.read(4))[0]
 	
-	for polygon in range(mdl0_polygons):
-		try:
-			work_bmesh.faces.new((work_bmesh.verts[x] for x in unpack('3H', f.read(6))))
-		except ValueError: # accounts for models of type double, but does not fix the problem
-			print('Polygon %i is a two-sided face, and this is unsupported.' % polygon)
+	buildfaces(work_bmesh, mdl0_fill_type, mdl0_polygons, f)
 	
 	### uv
 	work_bmesh.faces.ensure_lookup_table()
-	work_bmesh.verts.index_update()
 	uv_layer = work_bmesh.loops.layers.uv.new()
 	for face in work_bmesh.faces:
 		for loop in face.loops: loop[uv_layer].uv = uvs[loop.vert.index]
