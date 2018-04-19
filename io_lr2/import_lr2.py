@@ -289,7 +289,7 @@ def open_mdl2(filepath, open_bitmaps = True):
 					geo1_fill_type                ,\
 					geo1_fill_indices              = unpack('3I', f.read(12))
 					
-					buildfaces(work_bmesh, mdl0_fill_type, mdl0_polygons, f)
+					buildfaces(work_bmesh, geo1_fill_type, geo1_rendergroup_polygons, f)
 					
 					### uv
 					work_bmesh.faces.ensure_lookup_table()
