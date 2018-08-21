@@ -1,14 +1,30 @@
-# There are 1022 md2 files in the game data directory.
+# There are 1022 md2 files in LR2.
+# There are 552  md2 files in DR.
 
-# .md2 chunks:
-b'MDL2', # header, texture info
-b'MDL1', # old model version
-b'MDL0', # old model version with no chunk system
-b'P2G0', # unknown
-b'GEO1', # GEOmetry, mesh data
-b'COLD', # COLlision Data
-b'SHA0', # unknown
-b'SKN0', # weights?
+# .md2 chunks, DromeEd seems to list some chunks that are never used
+# L = Lego Racers 2
+# D = Drome Racers
+
+     L D
+MDL3   X # MoDeL header, DR main
+MDL2 X   # MoDeL header, LR2 main
+MDL1 X   # MoDeL header, LR2 rare
+MDL0 X   # MoDeL header, file has no chunk system, LR2 rare
+P2G0 X X # Playstation 2 Geometry?
+GCG0 X X # GameCube Geometry?
+GEO0     # GEOmetry, LR2 rare
+GEO1 X   # GEOmetry, LR2 main
+GEO2   X # GEOmetry, DR main
+COLD X   # COLlision Data
+SHA0 X   # SHAdow
+P2S0     # Playstation 2 Shadow
+P2I0     # Playstation 2 Index
+SKN0 X X # SKiN, DR rare
+SKN1   X # playstation 2 SKiN, DR rare
+SKN2   X # SKiN, DR rare
+SKNG   X # Gamecube SKiN, DR rare
+ANC0   X # ANChor
+COI0   X # ???
 
 # in this file i define these groups of models:
 # old      - 18 files with old version headers
