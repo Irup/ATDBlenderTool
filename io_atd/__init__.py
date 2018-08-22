@@ -42,7 +42,7 @@ class ImportATD(bpy.types.Operator, ImportHelper):
 	filename_ext = ".md2"
 	filter_glob  = StringProperty(default="*.md2", options={'HIDDEN'})
 	
-	md2_open_bitmaps = BoolProperty(
+	md2_usebitmaps = BoolProperty(
 		name		= 'Find and open bitmaps',
 		description = 'Opens relevant images from the "game data" directory, if the model file is loaded from there.',
 		default	 = True,
@@ -51,7 +51,7 @@ class ImportATD(bpy.types.Operator, ImportHelper):
 	def execute(self, context):
 		paths = [os.path.join(self.directory, name.name) for name in self.files]
 		keywords = {
-			'open_bitmaps': self.md2_open_bitmaps,
+			'usebitmaps': self.md2_usebitmaps,
 		}
 		if not paths: paths.append(self.filepath)
 		from . import import_atd
