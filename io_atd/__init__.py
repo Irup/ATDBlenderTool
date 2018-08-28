@@ -1,6 +1,6 @@
 bl_info = {
 	"name"       : "Attention To Detail .MD2 model import/export",
-	"author"     : "Irup at Rock Raiders United, with help from Will Kirby's LibLR2 and epicabsol's DromeEd.",
+	"author"     : "Irup at Rock Raiders United, with help from Will Kirkby's LibLR2 and epicabsol's DromeEd.",
 	"blender"    : (2, 74, 0),
 	"location"   : "File > Import-Export",
 	"description": "Imports or exports an .MD2 model compatible with Attention To Detail games.",
@@ -45,13 +45,19 @@ class ImportATD(bpy.types.Operator, ImportHelper):
 	md2_usebitmaps = BoolProperty(
 		name		= 'Find and open bitmaps',
 		description = 'Opens relevant images from the "game data" directory, if the model file is loaded from there.',
-		default	 = True,
+		default	    = True,
+	)
+	md2_usetext = BoolProperty(
+		name		= 'Load model settings',
+		description = 'Generate a text object to preserve model settings, like shading',
+		default	    = True,
 	)
 	
 	def execute(self, context):
 		paths = [os.path.join(self.directory, name.name) for name in self.files]
 		keywords = {
 			'usebitmaps': self.md2_usebitmaps,
+			'use_text'  : self.md2_usetext,
 		}
 		if not paths: paths.append(self.filepath)
 		from . import import_atd
@@ -69,26 +75,25 @@ class ExportATD(bpy.types.Operator, ExportHelper):
 	
 	md2_version = EnumProperty(
 		name		= 'Version',
-		#description = 'Keep this at default (MDL2) if unsure. For testing purposes.',
-		description = 'For future support.',
-		items	   = (
+		description = 'Keep this at default (MDL2) if unsure. For testing purposes',
+		items	    = (
 			('MDL2', 'MDL2', ''),
-			#('MDL1', 'MDL1', ''),
-			#('MDL0', 'MDL0', ''),
+			('MDL1', 'MDL1', ''),
+			('MDL0', 'MDL0', ''),
 		)
 	)
 	
-	md2_distance_fades = BoolProperty(
-		name		= 'Distance fade',
-		description = 'Makes the model fade when far away',
-		default	    = False,
+	md2_usetext = BoolProperty(
+		name		= 'Use model settings',
+		description = 'Use the model text object for options including shading',
+		default	    = True,
 	)
 
 	def execute(self, context):
 		from . import export_atd
 		keywords = {
-			'version': self.md2_version,
-			'distance_fades': self.md2_distance_fades,
+			'version' : self.md2_version,
+			'use_text': self.md2_usetext,
 		}
 		export_atd.write_atd(self.filepath, **keywords)
 		return {'FINISHED'}

@@ -2,6 +2,7 @@ from struct  import unpack
 from sys     import argv
 from os.path import split, splitext, join
 from io      import BytesIO as bio
+from ast     import literal_eval as leval
 import bpy, bmesh
 	
 VERTEX_HAS_VECTOR = 0b0001 # invariable

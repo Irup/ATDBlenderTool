@@ -2,6 +2,9 @@ from struct import pack
 import bpy, bmesh
 from io import BytesIO as bio
 
+f2i = lambda s, f = {}: sum(leval(x[:10]) if x.startswith('0x') else int(x) if x.isnumeric() else f[x] for x in s.replace(' ', '').split('|'))
+b2i = lambda s: int(s) if s.isnumeric() else {'true': 1, 'false': 2}[s.lower()]
+
 def write_atd(filepath, **kwargs):
 	assert 'version' in kwargs, 'Did not recieve version string.'
 	v = kwargs['version']
